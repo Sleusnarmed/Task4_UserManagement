@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Task4_UserManagement.props" />
+</Project>
