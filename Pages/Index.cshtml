@@ -4,7 +4,61 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+  <div class="container vh-100 d-flex align-items-center justify-content-center">
+        <div class="auth-container bg-white rounded shadow-sm p-4">
+            <!-- Toggle inputs (hidden) -->
+            <input type="radio" name="auth-toggle" id="signin-toggle" class="hidden" checked>
+            <input type="radio" name="auth-toggle" id="signup-toggle" class="hidden">
+            
+            <!-- Toggle buttons -->
+            <div class="toggle-buttons">
+                <label for="signin-toggle" class="toggle-label rounded-start">Sign In</label>
+                <label for="signup-toggle" class="toggle-label rounded-end">Sign Up</label>
+            </div>
+            
+            <!-- Forms container -->
+            <div class="auth-forms">
+                <!-- Sign In Form -->
+                <form id="signin-form" class="auth-form">
+                    <div class="mb-3">
+                        <label for="login-email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="login-email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="login-password" required>
+                    </div>
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </div>
+                    <div class="text-center">
+                        <a href="#" class="text-decoration-none">Forgot your password?</a>
+                    </div>
+                </form>
+                
+                <!-- Sign Up Form -->
+                <form id="signup-form" class="auth-form">
+                    <div class="mb-3">
+                        <label for="signup-name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="signup-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signup-email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="signup-email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signup-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="signup-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="signup-confirm-password" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>

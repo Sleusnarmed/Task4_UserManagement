@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("198d731d-fc07-4056-a636-cbdc1d7037a5")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Task4_UserManagement")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e3e977916eba92c0cfaab056fe533fc72ba48973")]
 [assembly: System.Reflection.AssemblyProductAttribute("Task4_UserManagement")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Task4_UserManagement")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

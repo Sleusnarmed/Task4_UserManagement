@@ -18,16 +18,16 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\ansal\Documents\dotnet-tests\Task4_UserManagement
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/ansal/Documents/dotnet-tests/Task4_UserManagement/Pages/AdminPanel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYW5lbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/ansal/Documents/dotnet-tests/Task4_UserManagement/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/ansal/Documents/dotnet-tests/Task4_UserManagement/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/ansal/Documents/dotnet-tests/Task4_UserManagement/Pages/Privacy.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/ansal/Documents/dotnet-tests/Task4_UserManagement/Pages/Shared/_ValidationScriptsPartial.cshtml]

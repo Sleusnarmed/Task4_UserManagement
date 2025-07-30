@@ -1,3 +1,50 @@
+:root {
+  --main-color: #082eb5;
+  --main-color-rgb: 8, 46, 181;
+  --main-color-hover: #06248c;
+  --main-color-active: #00155e;
+  --links-color: #004ad4;
+  --links-color-bg: #fc87fc;
+  --second-color: #0b75fd;
+  --second-color-rgb: 11, 117, 253;
+  --third-color: #ff04d5;
+  --button-third-color: #ff04d5;
+  --button-third-color-hover: #da05b6;
+  --third-color-hover: #da05b6;
+  --third-color-active: #ba029b;
+  --gradient-1: #007aff;
+  --gradient-2: #2767f8;
+  --gradient-3: #ff00cf;
+  --fourth-color: #091e6c;
+  --fourth-color-rgb: 9, 30, 108;
+  --fourth-color-opacity-hover: rgba(9, 30, 108, 0.3);
+  --nav-link-color: #fff;
+  --circle-gradient-1: #2767f8;
+  --circle-gradient-2: #8938e5;
+  --circle-gradient-4: #ff00cf;
+  --main-gradient: linear-gradient(
+    279.09deg,
+    #007aff,
+    #2767f8 15.7%,
+    #8938e5 51.03%,
+    #ff00cf 90.95%
+  );
+  --tabs-gradient: linear-gradient(
+    279.09deg,
+    #007aff,
+    #2767f8 15.7%,
+    #8938e5 51.03%,
+    #ff00cf 90.95%
+  );
+  --scheme-progress-gradient: linear-gradient(
+    90deg,
+    #007aff 0%,
+    #2767f8 15.7%,
+    #8938e5 51.03%,
+    #ff00cf 90.95%
+  );
+}
+
 html {
   font-size: 14px;
 }
@@ -8,7 +55,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
