@@ -5,6 +5,10 @@
       "PackagePath": "staticwebassets\\Task4_UserManagement.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\ansal\\Documents\\dotnet-tests\\Task4_UserManagement\\wwwroot\\css\\components\\admin.css",
+      "PackagePath": "staticwebassets\\css\\components\\admin.css"
+    },
+    {
       "Id": "C:\\Users\\ansal\\Documents\\dotnet-tests\\Task4_UserManagement\\wwwroot\\css\\components\\login.css",
       "PackagePath": "staticwebassets\\css\\components\\login.css"
     },

@@ -45,8 +45,11 @@
   );
 }
 
-html {
+html, * {
   font-size: 14px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -70,4 +73,6 @@ html {
 
 body {
   margin-bottom: 60px;
+  padding: 0;
+  background-color: var(--links-color);
 }

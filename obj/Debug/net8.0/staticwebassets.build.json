@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "av51EK5Bhk9G2rIPaUqCwLaVwXv+wsKrNOuTLjNWDm8=",
+  "Hash": "3Fp4vkmPQmTE6tn4xFHs2srfiPt55mVBFLjs25FN4JU=",
   "Source": "Task4_UserManagement",
   "BasePath": "_content/Task4_UserManagement",
   "Mode": "Default",
@@ -53,6 +53,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\ansal\\Documents\\dotnet-tests\\Task4_UserManagement\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\Task4_UserManagement.bundle.scp.css"
+    },
+    {
+      "Identity": "C:\\Users\\ansal\\Documents\\dotnet-tests\\Task4_UserManagement\\wwwroot\\css\\components\\admin.css",
+      "SourceId": "Task4_UserManagement",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\ansal\\Documents\\dotnet-tests\\Task4_UserManagement\\wwwroot\\",
+      "BasePath": "_content/Task4_UserManagement",
+      "RelativePath": "css/components/admin.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\components\\admin.css"
     },
     {
       "Identity": "C:\\Users\\ansal\\Documents\\dotnet-tests\\Task4_UserManagement\\wwwroot\\css\\components\\login.css",
