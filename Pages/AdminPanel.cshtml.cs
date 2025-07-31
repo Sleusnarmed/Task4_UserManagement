@@ -3,75 +3,74 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Task4_UserManagement.Models;
 using Task4_UserManagement.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using Microsoft.AspNetCore.Http; // Add this for session
+using Microsoft.AspNetCore.Http;
 
 namespace Task4_UserManagement.Pages;
 
 public class AdminPanelModel : PageModel
 {
     private readonly UserIndexContext _context;
-
     public List<User> Users { get; set; } = new();
 
-    public AdminPanelModel(UserIndexContext context)
-    {
-        _context = context;
-    }
+    public AdminPanelModel(UserIndexContext context) => _context = context;
 
     public async Task<IActionResult> OnGetAsync()
     {
-        // Authentication check
-        if (HttpContext.Session.GetInt32("UserId") == null)
-        {
-            return RedirectToPage("/Index");
-        }
-
+        if (!IsAuthenticated()) return RedirectToPage("/Index");
         Users = await _context.Users.ToListAsync();
         return Page();
     }
 
-    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds)
-    {
-        await UpdateUserStatus(selectedUserIds, "blocked");
-        return RedirectToPage();
-    }
+    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds) => 
+        await ProcessUserAction(selectedUserIds, "blocked");
 
-    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds)
-    {
-        await UpdateUserStatus(selectedUserIds, "active");
-        return RedirectToPage();
-    }
+    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds) => 
+        await ProcessUserAction(selectedUserIds, "active");
 
     public async Task<IActionResult> OnPostDeleteUsersAsync(int[] selectedUserIds)
-    {   
-        var users = await _context.Users
-            .Where(u => selectedUserIds.Contains(u.Id))
-            .ToListAsync();
-
-        _context.Users.RemoveRange(users);
+    {
+        if (IsCurrentUserBlocked()) return RedirectToPage();
+        _context.Users.RemoveRange(await GetUsersByIds(selectedUserIds));
         await _context.SaveChangesAsync();
         return RedirectToPage();
     }
 
+    private async Task<IActionResult> ProcessUserAction(int[] userIds, string status)
+    {
+        if (IsCurrentUserBlocked()) return RedirectToPage();
+        await UpdateUserStatus(userIds, status);
+        return RedirectToPage();
+    }
 
     private async Task UpdateUserStatus(int[] userIds, string status)
     {
-        var users = await _context.Users
-            .Where(u => userIds.Contains(u.Id))
-            .ToListAsync();
-
-        foreach (var user in users)
-        {
-            user.Status = status;
-        }
+        var users = await GetUsersByIds(userIds);
+        users.ForEach(u => u.Status = status);
         await _context.SaveChangesAsync();
     }
 
-    public static string GetRelativeTime(DateTime? date)
+    private async Task<List<User>> GetUsersByIds(int[] userIds) => 
+        await _context.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+
+    private bool IsCurrentUserBlocked()
     {
-        if (!date.HasValue) return "just now";
-        var timeSpan = DateTime.UtcNow - date.Value; 
+        var currentUser = GetCurrentUser();
+        return currentUser?.Status == "blocked";
+    }
+
+    private bool IsAuthenticated() => HttpContext.Session.GetInt32("UserId") != null;
+
+    private User? GetCurrentUser()
+    {
+        var userId = HttpContext.Session.GetInt32("UserId");
+        return userId.HasValue ? _context.Users.Find(userId.Value) : null;
+    }
+
+    public static string GetRelativeTime(DateTime? date) => 
+        date.HasValue ? CalculateTimeDifference(DateTime.UtcNow - date.Value) : "just now";
+
+    private static string CalculateTimeDifference(TimeSpan timeSpan)
+    {
         double delta = Math.Abs(timeSpan.TotalSeconds);
         return delta switch
         {
