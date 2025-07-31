@@ -8,22 +8,12 @@ namespace Task4_UserManagement.Data;
 
 public partial class UserIndexContext : DbContext
 {
-    public UserIndexContext()
-    {
-    }
-    private readonly IConfiguration _configuration;
-   public UserIndexContext(DbContextOptions<UserIndexContext> options, IConfiguration configuration)
+    public UserIndexContext(DbContextOptions<UserIndexContext> options)
         : base(options)
     {
-        _configuration = configuration;
     }
 
     public virtual DbSet<User> Users { get; set; }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(
-            _configuration.GetConnectionString("Default"), 
-            Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.4.6-mysql")
-        );
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
