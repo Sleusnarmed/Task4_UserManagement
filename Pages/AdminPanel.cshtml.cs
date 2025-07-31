@@ -4,6 +4,7 @@ using Task4_UserManagement.Models;
 using Task4_UserManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Microsoft.AspNetCore.Http; // Add this for session
 
 namespace Task4_UserManagement.Pages;
 
@@ -18,9 +19,16 @@ public class AdminPanelModel : PageModel
         _context = context;
     }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
+        // Authentication check
+        if (HttpContext.Session.GetInt32("UserId") == null)
+        {
+            return RedirectToPage("/Index");
+        }
+
         Users = await _context.Users.ToListAsync();
+        return Page();
     }
 
     public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds)
@@ -36,7 +44,7 @@ public class AdminPanelModel : PageModel
     }
 
     public async Task<IActionResult> OnPostDeleteUsersAsync(int[] selectedUserIds)
-    {
+    {   
         var users = await _context.Users
             .Where(u => selectedUserIds.Contains(u.Id))
             .ToListAsync();
@@ -45,6 +53,7 @@ public class AdminPanelModel : PageModel
         await _context.SaveChangesAsync();
         return RedirectToPage();
     }
+
 
     private async Task UpdateUserStatus(int[] userIds, string status)
     {
@@ -61,7 +70,7 @@ public class AdminPanelModel : PageModel
 
     public static string GetRelativeTime(DateTime? date)
     {
-        if (!date.HasValue) return "Just Now";
+        if (!date.HasValue) return "just now";
         var timeSpan = DateTime.UtcNow - date.Value; 
         double delta = Math.Abs(timeSpan.TotalSeconds);
         return delta switch
