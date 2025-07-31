@@ -13,9 +13,7 @@ public partial class User
 
     public string PasswordHash { get; set; } = null!;
 
+    public string Status { get; set; } = "active";
     public DateTime? LastLogin { get; set; }
-
-    public DateTime? RegistrationTime { get; set; }
-
-    public string? Status { get; set; }
+    public DateTime RegistrationTime { get; set; }
 }

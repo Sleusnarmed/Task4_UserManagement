@@ -1,42 +1,33 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using Task4_UserManagement.Data;
 using Task4_UserManagement.Models;
+
 
 namespace Task4_UserManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController(UserIndexContext context) : ControllerBase
     {
-        private readonly UserIndexContext _context;
-        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly UserIndexContext _context = context;
+        private readonly IPasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
 
-        public UsersController(UserIndexContext context)
-        {
-            _context = context;
-            _passwordHasher = new PasswordHasher<User>();
-        }
-
-        // GET: api/users
+        // GET: api/users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return user;
-        }
+        public async Task<ActionResult<UserResponse>> GetUser(int id) =>
+            await _context.Users.FindAsync(id) is { } user
+                ? Ok(MapToResponse(user))
+                : NotFound();
 
         // POST: api/users/signup
         [HttpPost("signup")]
-        public async Task<ActionResult<User>> SignUp([FromBody] SignUpRequest request)
+        public async Task<ActionResult<UserResponse>> SignUp(SignUpRequest request)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-                return BadRequest("Email already exists");
+            if (await _context.Users.AnyAsync(u => u.Email.ToLower() == request.Email))
+                return Conflict("Email already exists.");
 
             var user = new User
             {
@@ -50,84 +41,72 @@ namespace Task4_UserManagement.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, MapToResponse(user));
         }
 
         // POST: api/users/login
         [HttpPost("login")]
-        public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (user == null)
-                return Unauthorized("Invalid credentials");
-
-            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
-            if (result != PasswordVerificationResult.Success)
-                return Unauthorized("Invalid credentials");
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email);
+            if (user is null || _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password)
+                != PasswordVerificationResult.Success)
+                return Unauthorized("Invalid credentials.");
 
             user.LastLogin = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            return Ok(new LoginResponse
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Status = user.Status
-            });
+            return Ok(new LoginResponse(user.Id, user.Name, user.Status));
         }
 
         // PATCH: api/users/5/block
         [HttpPatch("{id}/block")]
-        public async Task<IActionResult> BlockUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-                return NotFound();
+        public async Task<IActionResult> BlockUser(int id) =>
+            await UpdateUserStatus(id, "blocked");
 
-            user.Status = "blocked";
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // DELETE: api/users/{id}
+        // DELETE: api/users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            return await _context.Users.FindAsync(id) is { } user
+                ? await DeleteAndSave(user)
+                : NotFound();
+        }
+
+        private async Task<IActionResult> UpdateUserStatus(int id, string status)
+        {
+            if (await _context.Users.FindAsync(id) is not { } user)
                 return NotFound();
 
-            _context.Users.Remove(user);
+            user.Status = status;
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-        private async Task<bool> UserExists(int id)
+        private async Task<IActionResult> DeleteAndSave(User user)
         {
-            return await _context.Users.AnyAsync(e => e.Id == id);
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
+
+        private static UserResponse MapToResponse(User user) => new(
+            user.Id,
+            user.Name,
+            user.Email,
+            user.Status
+        );
     }
 
-    // Request/Response DTOs
-    public class SignUpRequest
-    {
-        public string Name { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string Password { get; set; } = null!;
-    }
+    // Record types for immutability and value-based equality
+    public record SignUpRequest(
+        [property: Required, EmailAddress] string Email,
+        [property: Required, MinLength(6)] string Password,
+        [property: Required, MaxLength(100)] string Name);
 
-    public class LoginRequest
-    {
-        public string Email { get; set; } = null!;
-        public string Password { get; set; } = null!;
-    }
+    public record LoginRequest(string Email, string Password);
 
-    public class LoginResponse
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = null!;
-        public string? Status { get; set; }
-    }
+    public record LoginResponse(int Id, string Name, string? Status);
+
+    public record UserResponse(int Id, string Name, string Email, string Status);
 }
