@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Task4_UserManagement.Models;
 using Task4_UserManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
+
 namespace Task4_UserManagement.Pages;
 
 public class AdminPanelModel : PageModel
@@ -55,5 +57,23 @@ public class AdminPanelModel : PageModel
             user.Status = status;
         }
         await _context.SaveChangesAsync();
+    }
+
+    public static string GetRelativeTime(DateTime? date)
+    {
+        if (!date.HasValue) return "Just Now";
+        var timeSpan = DateTime.UtcNow - date.Value; 
+        double delta = Math.Abs(timeSpan.TotalSeconds);
+        return delta switch
+        {
+            < 120 => "a minute ago",
+            < 3600 => $"{timeSpan.Minutes} minutes ago",
+            < 7200 => "an hour ago",
+            < 86400 => $"{timeSpan.Hours} hours ago",
+            < 172800 => "yesterday",
+            < 2592000 => $"{timeSpan.Days} days ago",
+            < 31104000 => $"{timeSpan.Days / 30} months ago",
+            _ => $"{timeSpan.Days / 365} years ago"
+        };
     }
 }

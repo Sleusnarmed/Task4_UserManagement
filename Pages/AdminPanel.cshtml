@@ -17,7 +17,6 @@
 
 <body>
     <div class="w-100 px-1">
-
         <!-- Toolbar -->
         <h2 class="mb-3">User Management</h2>
         <div class="d-flex justify-content-between flex-wrap align-items-center mb-4 px-4">
@@ -31,7 +30,7 @@
                 </button>
             </form>
             <div>
-                <input type="search">
+                <input type="search" class="form-control" placeholder="Search users...">
             </div>
         </div>
 
@@ -56,8 +55,8 @@
                             <td><input type="checkbox" class="user-checkbox" value="@user.Id" /></td>
                             <td>@user.Name</td>
                             <td>@user.Email</td>
-                            <td>@(user.LastLogin?.ToString("g") ?? "Never")</td>
-                            <td>@user.RegistrationTime.ToString("g")</td>
+                            <td>@AdminPanelModel.GetRelativeTime(user.LastLogin)</td>
+                            <td>@user.RegistrationTime.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <span class="status-badge @statusClass">
                                     @user.Status
@@ -68,7 +67,6 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 
     <script>
@@ -81,7 +79,7 @@
         document.getElementById('selectAllCheckbox').addEventListener('change', function () {
             document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = this.checked);
         });
+
     </script>
 </body>
-
 </html>
