@@ -4,7 +4,6 @@
     ViewData["Title"] = "Home page";
 }
 
-
 <div class="cont vh-100 d-flex align-items-center justify-content-center">
     <div class="auth-container rounded shadow-sm p-4">
         <h1>Welcome!</h1>
@@ -15,15 +14,18 @@
             <label for="signup-toggle" class="toggle-label rounded-end">Sign Up</label>
         </div>
         <div class="auth-forms">
-            <form id="signin-form" class="auth-form">
+            <!-- Login Form -->
+            <form method="post" id="signin-form" class="auth-form" asp-page-handler="Login">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="mb-3">
-                    <label for="login-email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="login-email" placeholder="Enter your email" required>
+                    <label asp-for="Email" class="form-label">Email address</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="Enter your email" required>
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
-                    <label for="login-password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="login-password" placeholder="Enter your password"
-                        required>
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" required minlength="1">
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="d-grid mb-3">
                     <button type="submit" class="btn btn-primary">Sign In</button>
@@ -33,20 +35,23 @@
                 </div>
             </form>
 
-            <form id="signup-form" class="auth-form">
+            <!-- Signup Form -->
+            <form method="post" id="signup-form" class="auth-form" asp-page-handler="SignUp">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="mb-3">
-                    <label for="signup-name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="signup-name" placeholder="Enter your full name"
-                        required>
+                    <label asp-for="Name" class="form-label">Full Name</label>
+                    <input asp-for="Name" type="text" class="form-control" placeholder="Enter your full name" required>
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
-                    <label for="signup-email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="signup-email" placeholder="Enter your email" required>
+                    <label asp-for="Email" class="form-label">Email address</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="Enter your email" required>
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
-                    <label for="signup-password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="signup-password" placeholder="Create a password"
-                        required>
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Create a password" required minlength="1">
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">Sign Up</button>
@@ -55,3 +60,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
