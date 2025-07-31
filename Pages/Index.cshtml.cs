@@ -48,7 +48,7 @@ namespace Task4_UserManagement.Pages
             // Store user ID in session
             HttpContext.Session.SetInt32("UserId", user.Id);
             
-            return RedirectToPage("/AdminPanel");
+            return RedirectToPage("/adminpanel");
         }
 
         public async Task<IActionResult> OnPostSignUp()
@@ -72,7 +72,7 @@ namespace Task4_UserManagement.Pages
             await _context.SaveChangesAsync();
 
             HttpContext.Session.SetInt32("UserId", user.Id);
-            return RedirectToPage("/AdminPanel");
+            return RedirectToPage("/adminpanel");
         }
     }
 }

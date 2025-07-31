@@ -1,18 +1,87 @@
 @page "/admin-panel"
-@model Task4_UserManagement.Pages.AdminPanelModel
+@model AdminPanelModel
 @{
-    Layout = null; // No shared layout
+    Layout = null;
     ViewData["Title"] = "Admin Panel";
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/components/admin.css" />
 </head>
+
 <body>
-    <h1 style="text-align:center; margin-top: 50px;">ADMIN PANEL</h1>
+    <div class="w-100 px-1">
+
+        <!-- Toolbar -->
+        <h2 class="mb-3">User Management</h2>
+        <div class="d-flex justify-content-between flex-wrap align-items-center mb-4 px-4">
+            <form method="post" class="btn-group">
+                <input type="hidden" name="selectedUserIds" id="selectedUserIds" />
+                <button type="submit" asp-page-handler="BlockUsers" class="btn btn-warning">Block</button>
+                <button type="submit" asp-page-handler="UnblockUsers" class="btn btn-success">Unblock</button>
+                <button type="submit" asp-page-handler="DeleteUsers" class="btn btn-danger"
+                    onclick="return confirm('Delete selected users?')">
+                    Delete
+                </button>
+            </form>
+            <div>
+                <input type="search">
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th><input type="checkbox" id="selectAllCheckbox"></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Last Seen</th>
+                        <th>Register Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        var statusClass = user.Status == "active" ? "status-active" : "status-blocked";
+                        <tr>
+                            <td><input type="checkbox" class="user-checkbox" value="@user.Id" /></td>
+                            <td>@user.Name</td>
+                            <td>@user.Email</td>
+                            <td>@(user.LastLogin?.ToString("g") ?? "Never")</td>
+                            <td>@user.RegistrationTime.ToString("g")</td>
+                            <td>
+                                <span class="status-badge @statusClass">
+                                    @user.Status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function () {
+            const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+                .map(cb => cb.value);
+            document.getElementById('selectedUserIds').value = selectedIds.join(',');
+        });
+
+        document.getElementById('selectAllCheckbox').addEventListener('change', function () {
+            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = this.checked);
+        });
+    </script>
 </body>
+
 </html>

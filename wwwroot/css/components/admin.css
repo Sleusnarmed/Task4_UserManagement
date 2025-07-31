@@ -1,3 +1,29 @@
-body {
-    background-color: green;
+html, body{
+    padding: 0;
+    margin: 0;
+    background-color: wheat;
+}
+
+.status-badge {
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-active {
+  background-color: #e3fcec;
+  color: #1f9d55;
+}
+
+.status-blocked {
+  background-color: #fcebea;
+  color: #cc1f1a;
+}
+
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 200px;
+  }
 }
