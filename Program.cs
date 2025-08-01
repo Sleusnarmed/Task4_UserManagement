@@ -6,10 +6,11 @@ using Task4_UserManagement.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
 builder.Services.AddRazorPages();
-builder.Services.AddDbContext<UserIndexContext>(options => 
+builder.Services.AddDbContext<UserIndexContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")),
+        mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
     ));
 builder.Services.AddSession();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();

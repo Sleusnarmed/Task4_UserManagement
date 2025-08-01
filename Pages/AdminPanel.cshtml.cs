@@ -34,13 +34,13 @@ public class AdminPanelModel : PageModel
         };
     }
 
-    public async Task<IActionResult> BlockUsers(int[] selectedUserIds) =>
+    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds) =>
         await ProcessUser(selectedUserIds, "blocked");
 
-    public async Task<IActionResult> UnblockUsers(int[] selectedUserIds) =>
+    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds) =>
         await ProcessUser(selectedUserIds, "active");
 
-    public async Task<IActionResult> DeleteUsers(int[] selectedUserIds)
+    public async Task<IActionResult> OnPostDeleteUsersAsync(int[] selectedUserIds)
     {
         _context.Users.RemoveRange(await GetUserIds(selectedUserIds));
         await _context.SaveChangesAsync();
@@ -49,11 +49,11 @@ public class AdminPanelModel : PageModel
 
     private async Task<IActionResult> ProcessUser(int[] userIds, string status)
     {
-        await UpdateUserStatus(userIds, status);
+        await UpdateStatus(userIds, status);
         return RedirectToPage();
     }
 
-    private async Task UpdateUserStatus(int[] userIds, string status)
+    private async Task UpdateStatus(int[] userIds, string status)
     {
         var users = await GetUserIds(userIds);
         users.ForEach(u => u.Status = status);

@@ -12,52 +12,36 @@ namespace Task4_UserManagement.Pages
         private readonly UserIndexContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        [BindProperty]
-        public string Email { get; set; } = null!;
-
-        [BindProperty]
-        public string Password { get; set; } = null!;
-
-        [BindProperty]
-        public string Name { get; set; } = null!;
+        [BindProperty] public string Email { get; set; } = null!;
+        [BindProperty] public string Password { get; set; } = null!;
+        [BindProperty] public string Name { get; set; } = null!;
 
         public IndexModel(UserIndexContext context, IPasswordHasher<User> passwordHasher)
-        {
-            _context = context;
-            _passwordHasher = passwordHasher;
-        }
+            => (_context, _passwordHasher) = (context, passwordHasher);
 
-        public void OnGet()
-        {
-        }
+        public void OnGet() { }
 
         public async Task<IActionResult> OnPostLogin()
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == Email);
-            
-            if (user == null || _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, Password) != PasswordVerificationResult.Success)
-            {
-                ModelState.AddModelError("", "Invalid credentials");
-                return Page();
-            }
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email.Equals(Email, StringComparison.OrdinalIgnoreCase));
 
-            // Update last login
+            if (user is null || _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, Password) != PasswordVerificationResult.Success)
+                return InvalidCredentials();
+
             user.LastLogin = DateTime.UtcNow;
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            // Store user ID in session
             HttpContext.Session.SetInt32("UserId", user.Id);
-            
             return RedirectToPage("/adminpanel");
         }
 
         public async Task<IActionResult> OnPostSignUp()
         {
-            if (await _context.Users.AnyAsync(u => u.Email.ToLower() == Email))
-            {
-                ModelState.AddModelError("", "Email already exists");
-                return Page();
-            }
+            if (await _context.Users.AnyAsync(u => u.Email.Equals(Email, StringComparison.OrdinalIgnoreCase)))
+                return InvalidCredentials("Email already exists");
 
             var user = new User
             {
@@ -65,14 +49,21 @@ namespace Task4_UserManagement.Pages
                 Email = Email,
                 PasswordHash = _passwordHasher.HashPassword(new User(), Password),
                 Status = "active",
-                RegistrationTime = DateTime.UtcNow
+                RegistrationTime = DateTime.UtcNow,
+                LastLogin = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
+            user.LastLogin = DateTime.UtcNow;
             HttpContext.Session.SetInt32("UserId", user.Id);
             return RedirectToPage("/adminpanel");
+        }
+
+        private IActionResult InvalidCredentials(string message = "Invalid credentials")
+        {
+            ModelState.AddModelError("", message);
+            return Page();
         }
     }
 }
