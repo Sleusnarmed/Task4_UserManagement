@@ -1,6 +1,8 @@
-html, body{
-    padding: 0;
-    margin: 0;
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background-color: rgb(251, 251, 251);
 }
 
 .status-badge {
@@ -21,14 +23,11 @@ html, body{
   color: #cc1f1a;
 }
 
-.table-responsive{
-    border-radius: 5px;
+.table-responsive {
+  border-radius: 5px;
 }
 .table-light th {
-    background-color: lightblue;
+  background-color: lightblue;
 }
-@media (max-width: 768px) {
-  .table-responsive {
-    font-size: 1000px;
-  }
-}
+
+
