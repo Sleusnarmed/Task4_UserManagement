@@ -34,16 +34,24 @@ public class AdminPanelModel : PageModel
         };
     }
 
-    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds) =>
-        await ProcessUser(selectedUserIds, "blocked");
+    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds)
+    {
+        await UpdateStatus(selectedUserIds, "blocked");
+        TempData["StatusMessage"] = "Successfully blocked user(s)";
+        return RedirectToPage();
+    }
 
-    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds) =>
-        await ProcessUser(selectedUserIds, "active");
-
+    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds)
+    {
+        await UpdateStatus(selectedUserIds, "active");
+        TempData["StatusMessage"] = "Successfully unblocked user(s)";
+        return RedirectToPage();
+    }
     public async Task<IActionResult> OnPostDeleteUsersAsync(int[] selectedUserIds)
     {
         _context.Users.RemoveRange(await GetUserIds(selectedUserIds));
         await _context.SaveChangesAsync();
+        TempData["StatusMessage"] = "Successfully deleted user(s)";
         return RedirectToPage();
     }
 
