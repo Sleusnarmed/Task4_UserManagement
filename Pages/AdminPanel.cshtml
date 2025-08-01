@@ -67,36 +67,22 @@
     </div>
 
     <script>
-        // Checkbox: Select all
-        document.getElementById('selectAllCheckbox').addEventListener('change', function () {
-            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = this.checked);
-        });
+        document.getElementById('selectAllCheckbox').onchange = (e) => 
+            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = e.target.checked);
 
-        function handleAction(button) {
-            const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
-            if (selectedIds.length === 0) {
-                return Swal.fire('Error', 'Please select at least one user.', 'error');
-            }
-
-            const action = button.dataset.action;
-            const handler = button.dataset.handler;
+        const handleAction = (btn) => {
+            const ids = [...document.querySelectorAll('.user-checkbox:checked')].map(cb => cb.value);
+            if (!ids.length) return Swal.fire('Error', 'Please select at least one user.', 'error');
             
-            document.getElementById('selectedUserIds').value = selectedIds.join(',');
-            const form = document.getElementById('actionForm');
-            form.action = `?handler=${handler}`;
-            form.submit();
-        }
+            document.getElementById('selectedUserIds').value = ids.join(',');
+            document.getElementById('actionForm').action = `?handler=${btn.dataset.handler}`;
+            document.getElementById('actionForm').submit();
+        };
 
-        // Show success message if present in URL
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const action = urlParams.get('action');
-            if (action) {
-                Swal.fire('Success', `Users ${action}ed successfully`, 'success');
-                // Clean the URL
-                history.replaceState(null, '', window.location.pathname);
-            }
-        });
+        if (new URLSearchParams(window.location.search).has('action')) {
+            Swal.fire('Success', `Users ${new URLSearchParams(window.location.search).get('action')}ed successfully`, 'success');
+            history.replaceState(null, '', location.pathname);
+        }
     </script>
 </body>
 </html>
