@@ -4,15 +4,8 @@ using Task4_UserManagement.Data;
 
 namespace Task4_UserManagement.Filters;
 
-public class AuthFilter : IAsyncPageFilter
+public class AuthFilter(UserIndexContext db) : IAsyncPageFilter
 {
-    private readonly UserIndexContext _db;
-
-    public AuthFilter(UserIndexContext db)
-    {
-        _db = db;
-    }
-
     public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var page = context.HandlerInstance.GetType().Name;
@@ -20,7 +13,7 @@ public class AuthFilter : IAsyncPageFilter
 
         if (page is "IndexModel" or "RegisterModel" ||
             session.GetInt32("UserId") is int id &&
-            await _db.Users.FindAsync(id) is { Status: not "blocked" })
+            await db.Users.FindAsync(id) is { Status: not "blocked" })
         {
             await next();
         }
