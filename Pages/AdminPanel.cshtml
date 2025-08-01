@@ -40,11 +40,21 @@
                 <thead class="table-light">
                     <tr>
                         <th><input type="checkbox" id="selectAllCheckbox"></th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Last Seen</th>
-                        <th>Register Time</th>
-                        <th>Status</th>
+                        <th><a
+                                href="?sortBy=name&asc=@(Request.Query["sortBy"] != "name" || Request.Query["asc"] != "True")">Name</a>
+                        </th>
+                        <th><a
+                                href="?sortBy=email&asc=@(Request.Query["sortBy"] != "email" || Request.Query["asc"] != "True")">Email</a>
+                        </th>
+                        <th><a
+                                href="?sortBy=lastSeen&asc=@(Request.Query["sortBy"] != "lastSeen" || Request.Query["asc"] != "True")">Last
+                                Seen</a></th>
+                        <th><a
+                                href="?sortBy=registerTime&asc=@(Request.Query["sortBy"] != "registerTime" || Request.Query["asc"] != "True")">Register
+                                Time</a></th>
+                        <th><a
+                                href="?sortBy=status&asc=@(Request.Query["sortBy"] != "status" || Request.Query["asc"] != "True")">Status</a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,7 +65,7 @@
                             <td><input type="checkbox" class="user-checkbox" value="@user.Id" /></td>
                             <td>@user.Name</td>
                             <td>@user.Email</td>
-                            <td>@AdminPanelModel.GetRelativeTime(user.LastLogin)</td>
+                            <td>@AdminPanelModel.GetTime(user.LastLogin)</td>
                             <td>@user.RegistrationTime.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <span class="status-badge @statusClass">

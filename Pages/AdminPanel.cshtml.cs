@@ -15,26 +15,39 @@ public class AdminPanelModel : PageModel
 
     public AdminPanelModel(UserIndexContext context) => _context = context;
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(string sortBy = "id", bool asc = true)
     {
-        Users = await _context.Users.ToListAsync();
+        Users = await SortUsers(_context.Users, sortBy, asc).ToListAsync();
         return Page();
     }
 
-    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds) => 
-        await ProcessUserAction(selectedUserIds, "blocked");
-
-    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds) => 
-        await ProcessUserAction(selectedUserIds, "active");
-
-    public async Task<IActionResult> OnPostDeleteUsersAsync(int[] selectedUserIds)
+    private static IQueryable<User> SortUsers(IQueryable<User> users, string sortBy, bool asc)
     {
-        _context.Users.RemoveRange(await GetUsersByIds(selectedUserIds));
+        return sortBy switch
+        {
+            "name" => asc ? users.OrderBy(u => u.Name) : users.OrderByDescending(u => u.Name),
+            "email" => asc ? users.OrderBy(u => u.Email) : users.OrderByDescending(u => u.Email),
+            "lastSeen" => asc ? users.OrderBy(u => u.LastLogin) : users.OrderByDescending(u => u.LastLogin),
+            "registerTime" => asc ? users.OrderBy(u => u.RegistrationTime) : users.OrderByDescending(u => u.RegistrationTime),
+            "status" => asc ? users.OrderBy(u => u.Status) : users.OrderByDescending(u => u.Status),
+            _ => users.OrderBy(u => u.Id)
+        };
+    }
+
+    public async Task<IActionResult> BlockUsers(int[] selectedUserIds) =>
+        await ProcessUser(selectedUserIds, "blocked");
+
+    public async Task<IActionResult> UnblockUsers(int[] selectedUserIds) =>
+        await ProcessUser(selectedUserIds, "active");
+
+    public async Task<IActionResult> DeleteUsers(int[] selectedUserIds)
+    {
+        _context.Users.RemoveRange(await GetUserIds(selectedUserIds));
         await _context.SaveChangesAsync();
         return RedirectToPage();
     }
 
-    private async Task<IActionResult> ProcessUserAction(int[] userIds, string status)
+    private async Task<IActionResult> ProcessUser(int[] userIds, string status)
     {
         await UpdateUserStatus(userIds, status);
         return RedirectToPage();
@@ -42,18 +55,18 @@ public class AdminPanelModel : PageModel
 
     private async Task UpdateUserStatus(int[] userIds, string status)
     {
-        var users = await GetUsersByIds(userIds);
+        var users = await GetUserIds(userIds);
         users.ForEach(u => u.Status = status);
         await _context.SaveChangesAsync();
     }
 
-    private async Task<List<User>> GetUsersByIds(int[] userIds) => 
+    private async Task<List<User>> GetUserIds(int[] userIds) =>
         await _context.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
 
-    public static string GetRelativeTime(DateTime? date) => 
-        date.HasValue ? CalculateTimeDifference(DateTime.UtcNow - date.Value) : "just now";
+    public static string GetTime(DateTime? date) =>
+        date.HasValue ? CalculateTime(DateTime.UtcNow - date.Value) : "Just Now";
 
-    private static string CalculateTimeDifference(TimeSpan timeSpan) => Math.Abs(timeSpan.TotalSeconds) switch
+    private static string CalculateTime(TimeSpan timeSpan) => Math.Abs(timeSpan.TotalSeconds) switch
     {
         < 60 => "Just now",
         < 120 => "a minute ago",
