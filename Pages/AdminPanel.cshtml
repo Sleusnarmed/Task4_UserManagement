@@ -7,57 +7,45 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="~/css/components/admin.css" />
 </head>
 
 <body>
     <div class="w-100 px-1">
-        <!-- Toolbar -->
         <h2 class="mb-3 mt-4 text-center">User Management</h2>
+
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 px-4 gap-3">
-            <form method="post" class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+            <form method="post" class="d-flex gap-2" id="actionForm">
                 <input type="hidden" name="selectedUserIds" id="selectedUserIds" />
-                <button type="submit" asp-page-handler="BlockUsers" class="btn btn-warning">Block</button>
-                <button type="submit" asp-page-handler="UnblockUsers" class="btn btn-success">Unblock</button>
-                <button type="button" class="btn btn-danger" id="deleteBtn">Delete</button>
-                <div id="deleteConfirmation" class="d-none mt-2">
-                    <span>Delete selected users?</span>
-                    <button type="submit" asp-page-handler="DeleteUsers"
-                        class="btn btn-sm btn-danger ms-2">Confirm</button>
-                    <button type="button" class="btn btn-sm btn-secondary ms-1" onclick="cancelDelete()">Cancel</button>
-                </div>
+                @foreach (var action in new[] { ("BlockUsers", "block", "warning"), ("UnblockUsers", "unblock", "success"), ("DeleteUsers", "delete", "danger") })
+                {
+                    <button type="button" class="btn btn-@action.Item3"
+                            data-handler="@action.Item1"
+                            data-action="@action.Item2"
+                            onclick="handleAction(this)">
+                        @action.Item2.First().ToString().ToUpper()@action.Item2.Substring(1)
+                    </button>
+                }
             </form>
-            <div class="w-90 w-md-auto">
-                <input type="search" class="form-control" placeholder="Search users...">
-            </div>
+            <input type="search" class="form-control" placeholder="Search users..." />
         </div>
 
-        <!-- Table -->
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th><input type="checkbox" id="selectAllCheckbox"></th>
-                        <th><a
-                                href="?sortBy=name&asc=@(Request.Query["sortBy"] != "name" || Request.Query["asc"] != "True")">Name</a>
-                        </th>
-                        <th><a
-                                href="?sortBy=email&asc=@(Request.Query["sortBy"] != "email" || Request.Query["asc"] != "True")">Email</a>
-                        </th>
-                        <th><a
-                                href="?sortBy=lastSeen&asc=@(Request.Query["sortBy"] != "lastSeen" || Request.Query["asc"] != "True")">Last
-                                Seen</a></th>
-                        <th><a
-                                href="?sortBy=registerTime&asc=@(Request.Query["sortBy"] != "registerTime" || Request.Query["asc"] != "True")">Register
-                                Time</a></th>
-                        <th><a
-                                href="?sortBy=status&asc=@(Request.Query["sortBy"] != "status" || Request.Query["asc"] != "True")">Status</a>
-                        </th>
+                        <th><input type="checkbox" id="selectAllCheckbox" /></th>
+                        @foreach (var header in new[] { "name", "email", "lastSeen", "registerTime", "status" })
+                        {
+                            var label = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(header.Replace("Time", " Time").Replace("Seen", " Seen"));
+                            var asc = Request.Query["sortBy"] != header || Request.Query["asc"] != "True";
+                            <th><a href="?sortBy=@header&asc=@asc">@label</a></th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -70,11 +58,7 @@
                             <td>@user.Email</td>
                             <td>@AdminPanelModel.GetTime(user.LastLogin)</td>
                             <td>@user.RegistrationTime.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                <span class="status-badge @statusClass">
-                                    @user.Status
-                                </span>
-                            </td>
+                            <td><span class="status-badge @statusClass">@user.Status</span></td>
                         </tr>
                     }
                 </tbody>
@@ -83,29 +67,36 @@
     </div>
 
     <script>
-        document.querySelector('form').addEventListener('submit', function () {
-            const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked'))
-                .map(cb => cb.value);
-            document.getElementById('selectedUserIds').value = selectedIds.join(',');
-        });
-
+        // Checkbox: Select all
         document.getElementById('selectAllCheckbox').addEventListener('change', function () {
             document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = this.checked);
         });
 
-        document.getElementById('deleteBtn').addEventListener('click', function () {
-            if (document.querySelectorAll('.user-checkbox:checked').length > 0) {
-                this.classList.add('d-none');
-                document.getElementById('deleteConfirmation').classList.remove('d-none');
+        function handleAction(button) {
+            const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+            if (selectedIds.length === 0) {
+                return Swal.fire('Error', 'Please select at least one user.', 'error');
             }
-        });
 
-        function cancelDelete() {
-            document.getElementById('deleteConfirmation').classList.add('d-none');
-            document.getElementById('deleteBtn').classList.remove('d-none');
+            const action = button.dataset.action;
+            const handler = button.dataset.handler;
+            
+            document.getElementById('selectedUserIds').value = selectedIds.join(',');
+            const form = document.getElementById('actionForm');
+            form.action = `?handler=${handler}`;
+            form.submit();
         }
 
+        // Show success message if present in URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            if (action) {
+                Swal.fire('Success', `Users ${action}ed successfully`, 'success');
+                // Clean the URL
+                history.replaceState(null, '', window.location.pathname);
+            }
+        });
     </script>
 </body>
-
 </html>

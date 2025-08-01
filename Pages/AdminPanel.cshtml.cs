@@ -34,31 +34,23 @@ public class AdminPanelModel : PageModel
         };
     }
 
-    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds)
-    {
-        await UpdateStatus(selectedUserIds, "blocked");
-        TempData["StatusMessage"] = "Successfully blocked user(s)";
-        return RedirectToPage();
-    }
+    public async Task<IActionResult> OnPostBlockUsersAsync(int[] selectedUserIds) =>
+        await ProcessUser(selectedUserIds, "blocked", "block");
 
-    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds)
-    {
-        await UpdateStatus(selectedUserIds, "active");
-        TempData["StatusMessage"] = "Successfully unblocked user(s)";
-        return RedirectToPage();
-    }
+    public async Task<IActionResult> OnPostUnblockUsersAsync(int[] selectedUserIds) =>
+        await ProcessUser(selectedUserIds, "active", "unblock");
+
     public async Task<IActionResult> OnPostDeleteUsersAsync(int[] selectedUserIds)
     {
         _context.Users.RemoveRange(await GetUserIds(selectedUserIds));
         await _context.SaveChangesAsync();
-        TempData["StatusMessage"] = "Successfully deleted user(s)";
-        return RedirectToPage();
+        return RedirectToPage(new { action = "delete" });
     }
 
-    private async Task<IActionResult> ProcessUser(int[] userIds, string status)
+    private async Task<IActionResult> ProcessUser(int[] userIds, string status, string action)
     {
         await UpdateStatus(userIds, status);
-        return RedirectToPage();
+        return RedirectToPage(new { action });
     }
 
     private async Task UpdateStatus(int[] userIds, string status)
